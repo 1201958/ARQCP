@@ -12,13 +12,15 @@ int main() {
     int buffer[BUFFER_LENGTH];  
     int head = 0;               
     int tail = 0;               
-    int value;                  // Variável para armazenar o valor retirado
+    int value;                  // Variável para armazenar o valor removido
 
     
     buffer[0] = 10;
     buffer[1] = 20;
     buffer[2] = 30;
-    tail = 3; 
+    buffer[3] = 40;
+    buffer[4] = 50;
+    tail = 5; 
 
     printf("Buffer inicial: ");
     for (int i = 0; i < tail; i++) {
@@ -40,10 +42,12 @@ int main() {
 
     // Teste 2: Adicionar novos valores no buffer e repetir o processo
     printf("\nAdicionar novos valores no buffer...\n");
-    buffer[0] = 40;
-    buffer[1] = 50;
-    buffer[2] = 60;
-    tail = 3; 
+    buffer[0] = 60;
+    buffer[1] = 70;
+    buffer[2] = 80;
+    buffer[3] = 90;
+    buffer[4] = 95;
+    tail = 5; 
 
     printf("Buffer atualizado: ");
     for (int i = 0; i < tail; i++) {
@@ -52,7 +56,7 @@ int main() {
     printf("\n");
 
     printf("\nRemover novos valores do buffer:\n");
-    head = 0; // Redefinimos head para testar com os novos valores
+    head = 0; 
     while (1) {
         int result = dequeue_value(buffer, BUFFER_LENGTH, &head, &tail, &value);
         if (result == 1) {

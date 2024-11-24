@@ -1,11 +1,10 @@
 .section .data
-empty_string:
-    .asciz ""         # String vazia para inicialização
+	empty_string:
+    .asciz ""         # String vazia 
 
 .section .text
-.global extract_data
+	.global extract_data
 
-# Função extract_data(char* str, char* token, char* unit, int* value)
 extract_data:
     pushq %rbp
     movq %rsp, %rbp
@@ -17,20 +16,20 @@ extract_data:
     pushq %r15
     
     movl $0, (%rcx)    # Inicializa *value com 0
-    movb $0, (%rdx)    # Inicializa *unit com '\0'
+    movb $0, (%rdx)    # Inicializa *unit com 0
     
-    # Guardar parâmetros
+    # Guarda parâmetros
     movq %rdi, %r12         # str
     movq %rsi, %r13         # token
     movq %rdx, %r14         # unit
     movq %rcx, %r15         # value
     
-    # Procurar token exato
+    # Procurar token 
     movq %r12, %rdi         # str
     movq %r13, %rsi         # token
     call .find_exact_token
-    testq %rax, %rax
-    jz .fail
+    testq %rax, %rax		# valida se o retorno é NULL
+    jz .fail				# se for null, salta para fail
     
     movq %rax, %r12         # Atualizar posição na string
     
@@ -39,7 +38,7 @@ extract_data:
     
 .find_unit:
     movb (%rdi), %al
-    testb %al, %al
+    testb %al, %al			# Verifica se é o final da string '\0'
     jz .fail
     
     cmpb $'u', %al
@@ -54,17 +53,18 @@ extract_data:
     jne .next_unit_char
     
     # Encontrou "unit:", copiar valor
-    addq $5, %rdi
-    movq %r14, %rdx
+    addq $5, %rdi				# Avança %rdi para o primeiro caractere após "unit:"
+    movq %r14, %rdx				# Move  (%r14) para %rdx
+
 .copy_unit:
-    movb (%rdi), %al
-    testb %al, %al
-    jz .fail
-    cmpb $'&', %al
+    movb (%rdi), %al			# Move o caractere atual de str para %al
+    testb %al, %al				# Verifica se é o final da string
+    jz .fail					# Se sim, falha
+    cmpb $'&', %al				# Valida se encontra '&'
     je .unit_done
     
-    movb %al, (%rdx)
-    incq %rdi
+    movb %al, (%rdx)			
+    incq %rdi					# Avança para o próximo caractere após '&'
     incq %rdx
     jmp .copy_unit
 
@@ -74,6 +74,7 @@ extract_data:
     
     # Procurar "value:"
     movq %rdi, %r12
+
 .find_value:
     movb (%rdi), %al
     testb %al, %al
@@ -95,20 +96,21 @@ extract_data:
     # Encontrou "value:", converter número
     addq $6, %rdi
     xorl %eax, %eax
+
 .convert_num:
-    movb (%rdi), %bl
-    subb $'0', %bl
-    cmpb $9, %bl
-    ja .num_done
+    movb (%rdi), %bl			# Carrega o caractere atual em %bl
+    subb $'0', %bl				# Converte o caractere de ASCII para número
+    cmpb $9, %bl				# Verifica se é um dígito válido (0–9)
+    ja .num_done				# Se não for, termina a conversão
     
-    imull $10, %eax
-    movzbl %bl, %ebx
-    addl %ebx, %eax
-    incq %rdi
-    jmp .convert_num
+    imull $10, %eax          # Multiplica o valor atual em %eax por 10
+    movzbl %bl, %ebx         # Move o número convertido para %ebx
+    addl %ebx, %eax          # Adiciona o dígito ao número
+    incq %rdi                # Avança para o próximo caractere
+    jmp .convert_num		  # Repete para o próximo dígito
 
 .num_done:
-    movl %eax, (%r15)
+    movl %eax, (%r15)		# Armazena o número convertido em value
     movl $1, %eax
     jmp .done
 
@@ -137,19 +139,19 @@ extract_data:
     popq %rbp
     ret
 
-# Nova função auxiliar para encontrar token exato
+# função para encontrar token 
 .find_exact_token:
     pushq %rbp
-    movq %rsp, %rbp
-    
+    movq %rsp, %rbp    
     xorq %rcx, %rcx         # índice na string principal
+
 .token_loop:
     movb (%rdi, %rcx), %al
     testb %al, %al
     jz .token_not_found    # Fim da string
-
     # Verificar se é o início do token
     xorq %rdx, %rdx         # índice no token
+
 .compare_loop:
     movb (%rsi, %rdx), %bl  # Caractere do token
     testb %bl, %bl

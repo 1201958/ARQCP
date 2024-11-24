@@ -32,15 +32,15 @@ dequeue_value:
 
 check_empty:
 
-    # Verificar se o buffer está vazio
+    # Verifica se o buffer está vazio
     cmpl %ecx, %eax            # Compara head com tail
     je buffer_empty            # Se forem iguais, o buffer está vazio
     
-    # O buffer não está vazio - remove um valor
-    movl (%r12,%rax,4), %edx   # %edx = buffer[head] (carrega o valor na posição head)
-    movl %edx, (%rbx)          # *value = %edx (guarda o valor retirado no ponteiro de saída)
+    # buffer não está vazio - remove um valor
+    movl (%r12,%rax,4), %edx   # %edx = buffer[head] 
+    movl %edx, (%rbx)          # *value = %edx 
     
-    # Atualizar o índice head
+    # Atualiza o índice head
     incl %eax                  # Incrementa o índice head
     cmpl %r13d, %eax           # Compara head com length
     jl store_head              # Se head < length, salta para guardar o índice atualizado
